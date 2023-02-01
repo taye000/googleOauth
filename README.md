@@ -1,0 +1,1 @@
+A full stack react & node js application showcasing googleOauth sign up/in to the platform using an existing google account.
