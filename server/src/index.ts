@@ -1,3 +1,3 @@
-const main =async (params:any) => {
-    
-}
+const main = async (params: any) => {};
+
+main();

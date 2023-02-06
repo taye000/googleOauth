@@ -22,8 +22,8 @@ passport.use(
     function (request, accessToken, refreshToken, profile, done) {
       console.log(profile, "profile");
 
-      //check if the user is registered
-      user.findOne(
+      //check if the user is registered using User model(to be created)
+      User.findOne(
         { googleId: profile.id },
         async function (err: Error, user: any) {
           if (!user) {
