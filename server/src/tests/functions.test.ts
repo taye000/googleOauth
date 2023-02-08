@@ -1,8 +1,4 @@
-// import { functions } from "../functions";
-
-export const functions = {
-  add: (a:number, b:number) => a + b
-};
+import { functions } from "../functions";
 
 //test("description", function)
 test("Adds 2 + 2 to equal 4", () => {
