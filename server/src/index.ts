@@ -19,6 +19,23 @@ app.use((req, res, next) => {
   next();
 });
 
+//fetching all the uploads from cloudinary controller
+const getposts = async (req: Request, res: Response) => {
+  try {
+    const { resources } = await cloudinary.search
+      .expression("folder:samples")
+      .sort_by("public_id", "desc")
+      .max_results(30)
+      .execute();
+    const publicIds = resources.map((file: any) => file.public_id);
+    console.log(publicIds);
+    res.send(publicIds);
+  } catch (error) {
+    console.log("error fetching posts", error);
+  }
+};
+
+//posting to cloudinary controller
 const posting = async (req: Request, res: Response) => {
   console.log("req.body", req.body.data);
   try {
@@ -31,6 +48,10 @@ const posting = async (req: Request, res: Response) => {
   }
 };
 
+//fetching all the uploads from cloudinary route
+app.get("/", getposts);
+
+//posting to cloudinary route
 app.post("/cloud", posting);
 
 // Set Storage Engine
