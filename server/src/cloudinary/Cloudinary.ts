@@ -1,4 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+dotenv.config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -6,21 +8,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const opts = {
-  overwrite: true,
-  invalidate: true,
-  reaource_type: "auto",
-};
+module.exports = { cloudinary };
+export { cloudinary };
 
-export default (image: any) => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(image, opts, (error, result) => {
-      if (result && result.secure_url) {
-        console.log("result", result.secure_url);
-        return resolve(result.secure_url);
-      }
-      console.log("error", error);
-      return reject({ message: error?.message });
-    });
-  });
-};

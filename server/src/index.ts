@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
-import Cloudinary from "./cloudinary/Cloudinary";
+import { cloudinary } from "./cloudinary/Cloudinary";
 import cors from "cors";
 import bodyParser from "body-parser";
 
@@ -12,7 +12,7 @@ app.set("view engine", "ejs");
 
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb",extended: true }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -20,13 +20,16 @@ app.use((req, res, next) => {
 });
 
 const posting = async (req: Request, res: Response) => {
-  const { image } = req.body;
-  
-  console.log("image", image, req.body);
-  Cloudinary(req.body.image)
-    .then((url) => res.send(url))
-    .catch((error) => res.status(500).json({ message: error.message }));
-}
+  console.log("req.body", req.body.data);
+  try {
+    const result = await cloudinary.uploader.upload(
+      "http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcSULofuHPrn8WKiDotpGvagtZStVAO62DSqfKyykCnoQQ50h-EU3NQ1zZ5XF-n3317Ao9aonYeiuK3Kn90"
+    );
+    console.log("result", result);
+  } catch (error) {
+    console.log("error uploading file", error);
+  }
+};
 
 app.post("/cloud", posting);
 
