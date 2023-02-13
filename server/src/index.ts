@@ -23,9 +23,6 @@ app.use((req, res, next) => {
 //cloudinary storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    // folder: "dev_setups"
-  },
 });
 
 // Set multer Storage Engine
@@ -66,14 +63,11 @@ app.post(
   "/cloud",
   upload.single("image"),
   async (req: Request, res: Response) => {
-    console.log("req.file", req.file?.path);
-    try {
-      const result = await cloudinary.uploader.upload(req.body.file);
-
-      return res.json({result})
-    } catch (error) {
-      console.log("error uploading file", error);
-    }
+    res.status(201).json({
+      message: "image uploaded to cloudinary",
+      response: req.file,
+      cloudinaryLink: req.file?.path,
+    });
   }
 );
 
@@ -83,9 +77,13 @@ app.get("/upload", (req: Request, res: Response) => {
 });
 
 //multer POST route
-app.post("/upload", multerUpload.single("image"), (req: Request, res: Response) => {
-  res.send("image uploaded");
-});
+app.post(
+  "/upload",
+  multerUpload.single("image"),
+  (req: Request, res: Response) => {
+    res.send("image uploaded to local storage");
+  }
+);
 
 // server port
 const port = 5000;
