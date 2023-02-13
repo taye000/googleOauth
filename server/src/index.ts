@@ -4,6 +4,7 @@ import path from "path";
 import { cloudinary } from "./cloudinary/Cloudinary";
 import cors from "cors";
 import bodyParser from "body-parser";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const app = express();
 
@@ -18,6 +19,25 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
+
+//cloudinary storage
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+
+})
+
+// Set multer Storage Engine
+const storage = multer.diskStorage({
+  destination: (req: Request, file, cb) => {
+    cb(null, "Images");
+  },
+  filename: (req: Request, file, cb) => {
+    console.log(file);
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+//multer upload
+const upload = multer({ storage: storage });
 
 //fetching all the uploads from cloudinary controller
 const getposts = async (req: Request, res: Response) => {
@@ -37,7 +57,6 @@ const getposts = async (req: Request, res: Response) => {
 
 //posting to cloudinary controller
 const posting = async (req: Request, res: Response) => {
-  console.log("req.body", req.body.data);
   try {
     const result = await cloudinary.uploader.upload(
       "http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcSULofuHPrn8WKiDotpGvagtZStVAO62DSqfKyykCnoQQ50h-EU3NQ1zZ5XF-n3317Ao9aonYeiuK3Kn90"
@@ -54,18 +73,6 @@ app.get("/", getposts);
 //posting to cloudinary route
 app.post("/cloud", posting);
 
-// Set Storage Engine
-const storage = multer.diskStorage({
-  destination: (req: Request, file, cb) => {
-    cb(null, "Images");
-  },
-  filename: (req: Request, file, cb) => {
-    console.log(file);
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: storage });
 
 //multer GET route
 app.get("/upload", (req: Request, res: Response) => {
