@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
-import path from "path";
 import { cloudinary } from "./cloudinary/Cloudinary";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import path from "path";
 
 const app = express();
 
@@ -12,7 +12,7 @@ const app = express();
 app.set("view engine", "ejs");
 
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -21,13 +21,15 @@ app.use((req, res, next) => {
 });
 
 //cloudinary storage
-const cloudinaryStorage = new CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-
-})
+  params: {
+    // folder: "dev_setups"
+  },
+});
 
 // Set multer Storage Engine
-const storage = multer.diskStorage({
+const multerStorage = multer.diskStorage({
   destination: (req: Request, file, cb) => {
     cb(null, "Images");
   },
@@ -38,6 +40,7 @@ const storage = multer.diskStorage({
 });
 //multer upload
 const upload = multer({ storage: storage });
+const multerUpload = multer({ storage: multerStorage });
 
 //fetching all the uploads from cloudinary controller
 const getposts = async (req: Request, res: Response) => {
@@ -55,24 +58,24 @@ const getposts = async (req: Request, res: Response) => {
   }
 };
 
-//posting to cloudinary controller
-const posting = async (req: Request, res: Response) => {
-  try {
-    const result = await cloudinary.uploader.upload(
-      "http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcSULofuHPrn8WKiDotpGvagtZStVAO62DSqfKyykCnoQQ50h-EU3NQ1zZ5XF-n3317Ao9aonYeiuK3Kn90"
-    );
-    console.log("result", result);
-  } catch (error) {
-    console.log("error uploading file", error);
-  }
-};
-
 //fetching all the uploads from cloudinary route
 app.get("/", getposts);
 
 //posting to cloudinary route
-app.post("/cloud", posting);
+app.post(
+  "/cloud",
+  upload.single("image"),
+  async (req: Request, res: Response) => {
+    console.log("req.file", req.file?.path);
+    try {
+      const result = await cloudinary.uploader.upload(req.body.file);
 
+      return res.json({result})
+    } catch (error) {
+      console.log("error uploading file", error);
+    }
+  }
+);
 
 //multer GET route
 app.get("/upload", (req: Request, res: Response) => {
@@ -80,7 +83,7 @@ app.get("/upload", (req: Request, res: Response) => {
 });
 
 //multer POST route
-app.post("/upload", upload.single("image"), (req: Request, res: Response) => {
+app.post("/upload", multerUpload.single("image"), (req: Request, res: Response) => {
   res.send("image uploaded");
 });
 
