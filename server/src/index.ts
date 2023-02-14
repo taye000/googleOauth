@@ -58,6 +58,23 @@ const getposts = async (req: Request, res: Response) => {
 //fetching all the uploads from cloudinary route
 app.get("/", getposts);
 
+//pure cloudinary route
+const uploadImage = async (req: Request, res: Response) => {
+  const imagePath = req.file?.path;
+  try {
+    const result = await cloudinary.uploader.upload(imagePath!, {
+      folder: "samples",
+    });
+    console.log(result);
+    res.status(201).json({success: true, message: "image uploaded to cloudinary", response: result  });
+    return result;
+  } catch (error) {
+    res.status(500).json({success: false, message: "error uploading image", response: error  });
+    console.log("error uploading image", error);
+  }
+};
+app.post("/cloudinary", upload.single("image"), uploadImage);
+
 //posting to cloudinary route
 app.post(
   "/cloud",
