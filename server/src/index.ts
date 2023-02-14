@@ -75,19 +75,6 @@ const uploadImage = async (req: Request, res: Response) => {
 };
 app.post("/cloudinary", upload.single("image"), uploadImage);
 
-//posting to cloudinary route
-app.post(
-  "/cloud",
-  upload.single("image"),
-  async (req: Request, res: Response) => {
-    res.status(201).json({
-      message: "image uploaded to cloudinary",
-      response: req.file,
-      cloudinaryLink: req.file?.path,
-    });
-  }
-);
-
 //multer GET route
 app.get("/upload", (req: Request, res: Response) => {
   res.render("upload");
