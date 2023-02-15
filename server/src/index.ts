@@ -65,8 +65,9 @@ const uploadImage = async (req: Request, res: Response) => {
     const result = await cloudinary.uploader.upload(imagePath!, {
       folder: "samples",
     });
-    console.log(result);
-    res.status(201).json({success: true, message: "image uploaded to cloudinary", response: result  });
+    const imageURL = result.secure_url;
+
+    res.status(201).json({success: true, message: "image uploaded to cloudinary", imageURL  });
     return result;
   } catch (error) {
     res.status(500).json({success: false, message: "error uploading image", response: error  });
